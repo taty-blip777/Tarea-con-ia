@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AURUM POS — Sistema web para compra y venta de oro. Operaciones de mostrador, cálculo de valor de metal según peso y quilataje, consulta de inventario e historial.">
+    <title>AURUM POS — Sistema de Compra y Venta de Oro</title>
+
+    <!-- Hojas de estilo de la aplicación -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+    <div class="app">
+        <!-- Barra lateral de navegación -->
+        <aside class="sidebar" id="sidebar" aria-label="Menú lateral de navegación">
+            <div class="sidebar__brand">
+                <div class="sidebar__logo" aria-hidden="true">Au</div>
+                <div>
+                    <div class="sidebar__title">AURUM POS</div>
+                    <div class="sidebar__subtitle">Compra y Venta</div>
+                </div>
+            </div>
+
+            <nav class="sidebar__nav" aria-label="Navegación principal">
+                <div class="sidebar__section-title">Operaciones</div>
+                <button type="button" class="nav-item active" data-page="dashboard" id="nav-dashboard">
+                    <span class="nav-item__icon" aria-hidden="true">📊</span>
+                    <span>Dashboard</span>
+                </button>
+                <button type="button" class="nav-item" data-page="purchases" id="nav-purchases">
+                    <span class="nav-item__icon" aria-hidden="true">📥</span>
+                    <span>Nueva compra</span>
+                </button>
+                <button type="button" class="nav-item" data-page="sales" id="nav-sales">
+                    <span class="nav-item__icon" aria-hidden="true">📤</span>
+                    <span>Nueva venta</span>
+                </button>
+
+                <div class="sidebar__section-title">Gestión</div>
+                <button type="button" class="nav-item" data-page="inventory" id="nav-inventory">
+                    <span class="nav-item__icon" aria-hidden="true">📦</span>
+                    <span>Inventario</span>
+                </button>
+                <button type="button" class="nav-item" data-page="clients" id="nav-clients">
+                    <span class="nav-item__icon" aria-hidden="true">👥</span>
+                    <span>Clientes</span>
+                </button>
+                <button type="button" class="nav-item" data-page="history" id="nav-history">
+                    <span class="nav-item__icon" aria-hidden="true">📜</span>
+                    <span>Historial</span>
+                </button>
+
+                <div class="sidebar__section-title">Sistema</div>
+                <button type="button" class="nav-item" data-page="settings" id="nav-settings">
+                    <span class="nav-item__icon" aria-hidden="true">⚙️</span>
+                    <span>Configuración</span>
+                </button>
+            </nav>
+
+            <div class="sidebar__footer">
+                <div class="sidebar__demo-badge" title="Entorno local con datos de prueba">
+                    <span>⚠️</span>
+                    <span>Modo Demostración</span>
+                </div>
+                <p style="margin-top: var(--space-xs); font-size: var(--font-size-xs); color: var(--color-text-muted);">
+                    Frontend POS v1.0
+                </p>
+            </div>
+        </aside>
+
+        <!-- Overlay para navegación móvil -->
+        <div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
+
+        <!-- Área Principal de la Aplicación -->
+        <div class="main">
+            <!-- Encabezado superior -->
+            <header class="header" role="banner">
+                <div class="header__left">
+                    <button type="button" class="header__menu-btn btn--ghost" id="menu-btn" aria-label="Abrir o cerrar menú lateral">
+                        ☰
+                    </button>
+                    <h1 class="header__title" id="header-title">Dashboard</h1>
+                </div>
+
+                <div class="header__right">
+                    <div class="header__price-indicator" title="Precio de referencia por gramo de oro puro (valor de prueba)">
+                        <span class="header__price-label">Ref. Oro Puro:</span>
+                        <span id="header-ref-price">—</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Contenedor dinámico de vistas -->
+            <main class="content" id="main-content">
+                <section id="page-dashboard" class="page active" role="region" aria-label="Dashboard"></section>
+                <section id="page-purchases" class="page" role="region" aria-label="Nueva compra de oro"></section>
+                <section id="page-sales" class="page" role="region" aria-label="Nueva venta"></section>
+                <section id="page-inventory" class="page" role="region" aria-label="Inventario"></section>
+                <section id="page-clients" class="page" role="region" aria-label="Clientes"></section>
+                <section id="page-history" class="page" role="region" aria-label="Historial de operaciones"></section>
+                <section id="page-settings" class="page" role="region" aria-label="Configuración"></section>
+            </main>
+        </div>
+    </div>
+
+    <!-- Contenedor de Modales Accesibles -->
+    <div id="modal-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true"></div>
+
+    <!-- Contenedor de Notificaciones Toast -->
+    <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+    <!-- Scripts de la aplicación (JavaScript Puro / Vanilla JS) -->
+    <script src="js/calculations.js"></script>
+    <script src="js/validation.js"></script>
+    <script src="js/state.js"></script>
+    <script src="js/inventory.js"></script>
+    <script src="js/purchases.js"></script>
+    <script src="js/sales.js"></script>
+    <script src="js/history.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

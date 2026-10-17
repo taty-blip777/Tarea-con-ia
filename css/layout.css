@@ -1,0 +1,274 @@
+/* =============================================
+   AURUM POS — Layout
+   ============================================= */
+
+/* App Shell */
+.app {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ---- Sidebar ---- */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: var(--sidebar-width);
+    height: 100vh;
+    background: var(--color-surface);
+    border-right: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+    transition: transform var(--transition-base);
+    overflow-y: auto;
+}
+
+.sidebar__brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-lg) var(--space-lg);
+    border-bottom: 1px solid var(--color-border-light);
+}
+
+.sidebar__logo {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--color-gold), var(--color-gold-light));
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: var(--font-size-lg);
+    flex-shrink: 0;
+}
+
+.sidebar__title {
+    font-size: var(--font-size-lg);
+    font-weight: 700;
+    color: var(--color-text);
+    letter-spacing: -0.01em;
+}
+
+.sidebar__subtitle {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.sidebar__nav {
+    flex: 1;
+    padding: var(--space-md) var(--space-sm);
+}
+
+.sidebar__section-title {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: var(--space-md) var(--space-md) var(--space-sm);
+    font-weight: 600;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: 0.65rem var(--space-md);
+    border-radius: var(--radius-md);
+    color: var(--color-text-secondary);
+    font-weight: 500;
+    font-size: var(--font-size-sm);
+    transition: all var(--transition-fast);
+    cursor: pointer;
+    margin-bottom: 2px;
+    border: 2px solid transparent;
+    width: 100%;
+    text-align: left;
+}
+
+.nav-item:hover {
+    background-color: var(--color-gold-bg);
+    color: var(--color-gold);
+}
+
+.nav-item:focus-visible {
+    outline: 2px solid var(--color-gold);
+    outline-offset: -2px;
+}
+
+.nav-item.active {
+    background: var(--color-gold-bg);
+    color: var(--color-gold);
+    font-weight: 600;
+    border-color: var(--color-gold-border);
+}
+
+.nav-item__icon {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.sidebar__footer {
+    padding: var(--space-md) var(--space-lg);
+    border-top: 1px solid var(--color-border-light);
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+    text-align: center;
+}
+
+.sidebar__demo-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    background: var(--color-warning-bg);
+    color: var(--color-warning);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    border: 1px solid var(--color-warning-border);
+}
+
+/* ---- Main ---- */
+.main {
+    flex: 1;
+    margin-left: var(--sidebar-width);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Header */
+.header {
+    height: var(--header-height);
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 var(--space-xl);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+}
+
+.header__left {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.header__menu-btn {
+    display: none;
+    padding: var(--space-sm);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-secondary);
+    font-size: 1.25rem;
+}
+
+.header__menu-btn:hover {
+    background: var(--color-bg);
+}
+
+.header__title {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.header__right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.header__price-indicator {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    background: var(--color-gold-bg);
+    border: 1px solid var(--color-gold-border);
+    padding: var(--space-xs) var(--space-md);
+    border-radius: var(--radius-lg);
+    font-size: var(--font-size-sm);
+    color: var(--color-gold);
+    font-weight: 600;
+}
+
+.header__price-label {
+    font-weight: 400;
+    color: var(--color-text-secondary);
+}
+
+/* Content */
+.content {
+    flex: 1;
+    padding: var(--space-xl);
+    max-width: 1400px;
+    width: 100%;
+}
+
+/* ---- Overlay para mobile ---- */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 99;
+}
+
+.sidebar-overlay.active {
+    display: block;
+}
+
+/* =============================================
+   Responsive
+   ============================================= */
+
+/* Tablet */
+@media (max-width: 1024px) {
+    .sidebar {
+        transform: translateX(-100%);
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    .main {
+        margin-left: 0;
+    }
+
+    .header__menu-btn {
+        display: flex;
+    }
+
+    .content {
+        padding: var(--space-lg);
+    }
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+    .content {
+        padding: var(--space-md);
+    }
+
+    .header {
+        padding: 0 var(--space-md);
+    }
+
+    .header__price-indicator {
+        display: none;
+    }
+}
