@@ -290,7 +290,29 @@ const InventoryModule = (() => {
                     <span class="detail-field__value">${item.observations}</span>
                 </div>` : ''}
             </div>
-        `);
+        `, (() => {
+            const activeUser = typeof AuthModule !== 'undefined' ? AuthModule.getCurrentUser() : null;
+            const canManage = activeUser && (activeUser.role === 'ceo' || activeUser.role === 'admin' || activeUser.role === 'inventario');
+            const buttons = [
+                { label: 'Cerrar', class: 'btn btn--secondary', action: 'close' }
+            ];
+
+            if (canManage && item.status !== 'vendida') {
+                const nextStatus = item.status === 'disponible' ? 'reservada' : 'disponible';
+                const label = item.status === 'disponible' ? '◐ Marcar como Reservada' : '● Marcar como Disponible';
+                buttons.push({
+                    label,
+                    class: 'btn btn--primary',
+                    action: () => {
+                        AurumState.updateInventoryItem(item.id, { status: nextStatus });
+                        AurumApp.closeModal();
+                        AurumApp.showToast('Estado Actualizado', `La pieza ${item.id} se actualizó a estado: ${nextStatus}.`, 'success');
+                        renderTableRows();
+                    }
+                });
+            }
+            return buttons;
+        })());
     }
 
     return {

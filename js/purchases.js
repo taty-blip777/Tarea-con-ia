@@ -9,6 +9,20 @@ const PurchasesModule = (() => {
         const container = document.getElementById('page-purchases');
         if (!container) return;
 
+        if (typeof AuthModule !== 'undefined' && !AuthModule.canAccess('purchases')) {
+            container.innerHTML = `
+                <div class="card" style="text-align:center; padding:var(--space-2xl); max-width:650px; margin: var(--space-xl) auto;">
+                    <div style="font-size:3rem; margin-bottom:var(--space-md);">⚖️</div>
+                    <h3>Operaciones de Mostrador Restringidas</h3>
+                    <p style="color:var(--color-text-secondary); margin-top:var(--space-sm); font-size:var(--font-size-sm);">
+                        El registro de compras de mostrador está reservado para los roles <strong>Vendedor / Cajero</strong>, <strong>Administrador</strong> y <strong>CEO</strong>.
+                        Tu rol actual es: <strong>${AuthModule.getCurrentUser() ? AuthModule.getCurrentUser().roleLabel : 'Personal de Inventario'}</strong>.
+                    </p>
+                </div>
+            `;
+            return;
+        }
+
         const config = AurumState.getConfig();
         const clients = AurumState.getClients();
 

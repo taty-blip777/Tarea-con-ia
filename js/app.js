@@ -9,6 +9,9 @@ const AurumApp = (() => {
     // ---- Init ----
     function init() {
         AurumState.init();
+        if (typeof AuthModule !== 'undefined') {
+            AuthModule.init();
+        }
         setupNavigation();
         setupSidebar();
         renderPage('dashboard');
@@ -23,15 +26,29 @@ const AurumApp = (() => {
 
     // ---- Navigation ----
     function setupNavigation() {
-        document.querySelectorAll('.nav-item[data-page]').forEach(item => {
-            item.addEventListener('click', () => {
-                const page = item.dataset.page;
+        // Event delegation to seamlessly support dynamic navigation items (auth/profile/logout)
+        document.addEventListener('click', (e) => {
+            const navItem = e.target.closest('.nav-item[data-page]');
+            if (navItem) {
+                const page = navItem.dataset.page;
                 navigateTo(page);
-            });
+            }
         });
     }
 
     function navigateTo(page) {
+        // Enforce lock screen if no user is authenticated
+        if (typeof AuthModule !== 'undefined' && !AuthModule.getCurrentUser()) {
+            return;
+        }
+
+        // Enforce role-based access control
+        if (typeof AuthModule !== 'undefined' && !AuthModule.canAccess(page)) {
+            const user = AuthModule.getCurrentUser();
+            showToast('Acceso Denegado', `Tu rango (${user ? user.roleLabel : 'Invitado'}) no cuenta con permisos para el módulo de ${page}.`, 'warning');
+            page = 'dashboard';
+        }
+
         currentPage = page;
 
         // Update nav items
@@ -48,6 +65,8 @@ const AurumApp = (() => {
             clients: 'Clientes',
             history: 'Historial',
             settings: 'Configuración',
+            users: 'Gestión de Roles (CEO)',
+            profile: 'Mi Perfil de Usuario',
         };
         const headerTitle = document.getElementById('header-title');
         if (headerTitle) headerTitle.textContent = titles[page] || 'Dashboard';
@@ -73,6 +92,8 @@ const AurumApp = (() => {
             case 'clients': renderClients(); break;
             case 'history': HistoryModule.render(); break;
             case 'settings': renderSettings(); break;
+            case 'users': if (typeof AuthModule !== 'undefined') AuthModule.render('users'); break;
+            case 'profile': if (typeof AuthModule !== 'undefined') AuthModule.render('profile'); break;
         }
     }
 
@@ -226,6 +247,20 @@ const AurumApp = (() => {
     function renderClients() {
         const container = document.getElementById('page-clients');
         if (!container) return;
+
+        if (typeof AuthModule !== 'undefined' && !AuthModule.canAccess('clients')) {
+            container.innerHTML = `
+                <div class="card" style="text-align:center; padding:var(--space-2xl); max-width:650px; margin: var(--space-xl) auto;">
+                    <div style="font-size:3rem; margin-bottom:var(--space-md);">👥</div>
+                    <h3>Directorio de Clientes Restringido</h3>
+                    <p style="color:var(--color-text-secondary); margin-top:var(--space-sm); font-size:var(--font-size-sm);">
+                        El acceso al registro de clientes de mostrador está reservado para <strong>Vendedor / Cajero</strong>, <strong>Administrador</strong> y <strong>CEO</strong>.
+                        Tu rol actual es: <strong>${AuthModule.getCurrentUser() ? AuthModule.getCurrentUser().roleLabel : 'Personal de Inventario'}</strong>.
+                    </p>
+                </div>
+            `;
+            return;
+        }
 
         const clients = AurumState.getClients();
 
@@ -423,6 +458,21 @@ const AurumApp = (() => {
         const container = document.getElementById('page-settings');
         if (!container) return;
 
+        const activeUser = typeof AuthModule !== 'undefined' ? AuthModule.getCurrentUser() : null;
+        if (!activeUser || (activeUser.role !== 'ceo' && activeUser.role !== 'admin')) {
+            container.innerHTML = `
+                <div class="card" style="text-align:center; padding:var(--space-2xl); max-width:650px; margin: var(--space-xl) auto;">
+                    <div style="font-size:3rem; margin-bottom:var(--space-md);">🔒</div>
+                    <h3>Acceso Restringido</h3>
+                    <p style="color:var(--color-text-secondary); margin-top:var(--space-sm); font-size:var(--font-size-sm);">
+                        La configuración de parámetros financieros, precios de referencia y quilatajes requiere rango <strong>Administrador</strong> o <strong>CEO</strong>.
+                        Tu rango actual es: <strong>${activeUser ? activeUser.roleLabel : 'Invitado'}</strong>.
+                    </p>
+                </div>
+            `;
+            return;
+        }
+
         const config = AurumState.getConfig();
 
         container.innerHTML = `
@@ -486,15 +536,25 @@ const AurumApp = (() => {
                     </div>
                 </form>
             </div>
+        `;
 
-            <!-- Reset Demo -->
+        // Reset Demo (Solo CEO)
+        const user = typeof AuthModule !== 'undefined' ? AuthModule.getCurrentUser() : null;
+        const isCeo = user && user.role === 'ceo';
+
+        container.innerHTML += `
             <div class="card" style="max-width:700px; margin-top:var(--space-lg); border-color:var(--color-error-border);">
-                <h3 class="card__title" style="color:var(--color-error); margin-bottom:var(--space-sm);">⚠ Restablecer datos de demostración</h3>
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <h3 class="card__title" style="color:var(--color-error); margin-bottom:var(--space-sm);">⚠ Restablecer datos de demostración</h3>
+                    <span class="badge ${isCeo ? 'badge--ceo' : 'badge--sold'}">${isCeo ? '👑 Autorizado para CEO' : '🔒 Requiere Rango CEO'}</span>
+                </div>
                 <p style="font-size:var(--font-size-sm); color:var(--color-text-secondary); margin-bottom:var(--space-md);">
                     Esta acción eliminará todos los datos registrados en la sesión y restaurará los valores de demostración originales.
-                    Los registros locales pertenecen a este navegador, no se sincronizan entre equipos y pueden perderse al limpiar los datos del navegador.
+                    ${isCeo ? 'Como CEO, tienes la autorización para ejecutar el restablecimiento maestro.' : 'Privilegio reservado exclusivamente para la Dirección General (CEO).'}
                 </p>
-                <button class="btn btn--danger" onclick="AurumApp.confirmReset()">🗑 Restablecer demo</button>
+                <button class="btn btn--danger" ${isCeo ? '' : 'disabled title="Función exclusiva del CEO"'} onclick="AurumApp.confirmReset()">
+                    🗑 Restablecer demo ${isCeo ? '' : '(Bloqueado)'}
+                </button>
             </div>
         `;
 
@@ -520,19 +580,25 @@ const AurumApp = (() => {
     }
 
     function confirmReset() {
-        showModal('Confirmar restablecimiento', `
+        const user = typeof AuthModule !== 'undefined' ? AuthModule.getCurrentUser() : null;
+        if (!user || user.role !== 'ceo') {
+            showToast('Acción Bloqueada', 'Solo el usuario con rango CEO tiene privilegios para restablecer la base de datos.', 'error');
+            return;
+        }
+
+        showModal('Confirmar restablecimiento maestro', `
             <div style="text-align:center; padding:var(--space-lg) 0;">
-                <div style="font-size:3rem; margin-bottom:var(--space-md);">⚠</div>
-                <h3 style="margin-bottom:var(--space-md);">¿Restablecer todos los datos?</h3>
+                <div style="font-size:3rem; margin-bottom:var(--space-md);">👑</div>
+                <h3 style="margin-bottom:var(--space-md);">¿Restablecer todos los datos del POS?</h3>
                 <p style="color:var(--color-text-secondary); font-size:var(--font-size-sm);">
-                    Se eliminarán todas las operaciones, clientes e inventario registrados en esta sesión.
-                    Se restaurarán los datos de demostración originales.
+                    Acción autorizada por el CEO: <strong>${user.name}</strong>.
+                    Se eliminarán todas las operaciones, clientes e inventario registrados en esta sesión y se restaurarán los valores de fábrica.
                     Esta acción no se puede deshacer.
                 </p>
             </div>
         `, [
             { label: 'Cancelar', class: 'btn btn--secondary', action: 'close' },
-            { label: '🗑 Sí, restablecer', class: 'btn btn--danger', action: () => {
+            { label: '🗑 Sí, restablecer todo', class: 'btn btn--danger', action: () => {
                 AurumState.reset();
                 closeModal();
                 showToast('Datos restablecidos', 'Se restauraron los datos de demostración.', 'success');

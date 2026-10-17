@@ -12,7 +12,11 @@
     <link rel="stylesheet" href="css/components.css">
 </head>
 <body>
-    <div class="app">
+    <!-- Portal de Acceso y Autenticación Obligatorio (Pantalla de bloqueo hasta autenticación) -->
+    <div id="auth-portal" class="auth-portal"></div>
+
+    <!-- Aplicación Principal (Oculta hasta autenticación válida) -->
+    <div class="app" id="app-shell" style="display: none;">
         <!-- Barra lateral de navegación -->
         <aside class="sidebar" id="sidebar" aria-label="Menú lateral de navegación">
             <div class="sidebar__brand">
@@ -24,7 +28,7 @@
             </div>
 
             <nav class="sidebar__nav" aria-label="Navegación principal">
-                <div class="sidebar__section-title">Operaciones</div>
+                <div class="sidebar__section-title" id="section-title-ops">Operaciones</div>
                 <button type="button" class="nav-item active" data-page="dashboard" id="nav-dashboard">
                     <span class="nav-item__icon" aria-hidden="true">📊</span>
                     <span>Dashboard</span>
@@ -38,7 +42,7 @@
                     <span>Nueva venta</span>
                 </button>
 
-                <div class="sidebar__section-title">Gestión</div>
+                <div class="sidebar__section-title" id="section-title-mgmt">Gestión</div>
                 <button type="button" class="nav-item" data-page="inventory" id="nav-inventory">
                     <span class="nav-item__icon" aria-hidden="true">📦</span>
                     <span>Inventario</span>
@@ -52,12 +56,31 @@
                     <span>Historial</span>
                 </button>
 
-                <div class="sidebar__section-title">Sistema</div>
+                <div class="sidebar__section-title" id="section-title-sys">Sistema</div>
                 <button type="button" class="nav-item" data-page="settings" id="nav-settings">
                     <span class="nav-item__icon" aria-hidden="true">⚙️</span>
                     <span>Configuración</span>
                 </button>
+                <button type="button" class="nav-item nav-item--ceo" data-page="users" id="nav-users" style="display: none;">
+                    <span class="nav-item__icon" aria-hidden="true">👑</span>
+                    <span>Gestión de Roles (CEO)</span>
+                </button>
+
+                <div class="sidebar__section-title">Sesión</div>
+                <div id="sidebar-auth-nav">
+                    <button type="button" class="nav-item" data-page="profile" id="nav-profile">
+                        <span class="nav-item__icon" aria-hidden="true">👤</span>
+                        <span>Mi Perfil</span>
+                    </button>
+                    <button type="button" class="nav-item nav-item--logout" id="nav-logout-btn">
+                        <span class="nav-item__icon" aria-hidden="true">🚪</span>
+                        <span>Cerrar sesión</span>
+                    </button>
+                </div>
             </nav>
+
+            <!-- Widget de usuario en barra lateral -->
+            <div class="sidebar__user" id="sidebar-user-widget"></div>
 
             <div class="sidebar__footer">
                 <div class="sidebar__demo-badge" title="Entorno local con datos de prueba">
@@ -89,6 +112,7 @@
                         <span class="header__price-label">Ref. Oro Puro:</span>
                         <span id="header-ref-price">—</span>
                     </div>
+                    <div id="header-user-badge"></div>
                 </div>
             </header>
 
@@ -101,6 +125,8 @@
                 <section id="page-clients" class="page" role="region" aria-label="Clientes"></section>
                 <section id="page-history" class="page" role="region" aria-label="Historial de operaciones"></section>
                 <section id="page-settings" class="page" role="region" aria-label="Configuración"></section>
+                <section id="page-users" class="page" role="region" aria-label="Gestión de Roles y Usuarios"></section>
+                <section id="page-profile" class="page" role="region" aria-label="Perfil de usuario"></section>
             </main>
         </div>
     </div>
@@ -115,6 +141,7 @@
     <script src="js/calculations.js"></script>
     <script src="js/validation.js"></script>
     <script src="js/state.js"></script>
+    <script src="js/auth.js"></script>
     <script src="js/inventory.js"></script>
     <script src="js/purchases.js"></script>
     <script src="js/sales.js"></script>
